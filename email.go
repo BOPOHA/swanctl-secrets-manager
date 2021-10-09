@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2/types"
@@ -34,7 +33,6 @@ func (c *EmailConfig) setEmailTo(to string) {
 }
 
 func getSESEmailInput(config EmailConfig) *sesv2.SendEmailInput {
-	fmt.Printf("input: %+v\n", config)
 	return &sesv2.SendEmailInput{
 		Destination: &types.Destination{
 			BccAddresses: []string{config.emailBcc},
