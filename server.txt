@@ -1,0 +1,9 @@
+# server side
+
+REGULARUSER=regularuser
+adduser --system --group $REGULARUSER
+
+dnf install incron -y
+echo root > /etc/incron.allow
+echo "/home/$REGULARUSER/swanctl.eap.secrets IN_CLOSE_WRITE cp /home/$REGULARUSER/swanctl.eap.secrets /etc/strongswan/swanctl/conf.d/secrets && systemctl reload strongswan.service' > /var/spool/incron/root
+systemctl enable incrond --now
