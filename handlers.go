@@ -86,6 +86,8 @@ func (m *secretsManager) CleanExpiredEAP() {
 	for p, s := range m.eap {
 		if s.Expdate < time.Now().Unix() {
 			delete(m.eap, p)
+			SaveEAPtoFile(m.eap)
+			DumpEAPtoFile(m.eap)
 			log.Println("deleted user " + s.Id + "/" + s.Secret)
 		}
 	}
