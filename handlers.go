@@ -84,11 +84,15 @@ func (m *secretsManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (m *secretsManager) CleanExpiredEAP() {
 	m.mu.Lock()
 	for p, s := range m.eap {
+		anyBodyDeleted := false
 		if s.Expdate < time.Now().Unix() {
 			delete(m.eap, p)
+			log.Println("deleted user " + s.Id + "/" + s.Secret)
+			anyBodyDeleted = true
+		}
+		if anyBodyDeleted {
 			SaveEAPtoFile(m.eap)
 			DumpEAPtoFile(m.eap)
-			log.Println("deleted user " + s.Id + "/" + s.Secret)
 		}
 	}
 	//log.Printf("secrets:\n%s\n\n", m.eap)
