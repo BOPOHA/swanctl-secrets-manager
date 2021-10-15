@@ -5,6 +5,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"log"
 	"net/http"
+	"net/mail"
+	"strings"
 	"sync"
 	"time"
 )
@@ -26,9 +28,14 @@ func (m EAPSecretsMap) String() string {
 	return out
 }
 
+type smConfig struct {
+	emDomains []string
+}
+
 type secretsManager struct {
 	mu     sync.Mutex
 	client *sesv2.Client
+	conf   smConfig
 	eap    EAPSecretsMap
 }
 
@@ -48,7 +55,7 @@ func (m *secretsManager) setEAPSecret(email, password string) {
 func (m *secretsManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		reqEmail := r.FormValue("email")
-		ok, email := emailValidator(reqEmail)
+		ok, email := m.emailValidator(reqEmail)
 		if ok != true {
 			w.WriteHeader(http.StatusBadRequest)
 			writeWrapper(w.Write([]byte("bad email")))
@@ -99,18 +106,50 @@ func (m *secretsManager) CleanExpiredEAP() {
 	m.mu.Unlock()
 }
 
+func (m *secretsManager) emailValidator(email string) (ok bool, addres string) {
+	adr, err := mail.ParseAddress(email)
+	if err != nil {
+		// return false
+		return
+	}
+	addres = adr.Address
+
+	// if no trusted domains - pass all valid emails
+	if len(m.conf.emDomains) == 0 {
+		return true, addres
+	}
+	// checking that email domain in trusted list
+	for _, d := range m.conf.emDomains {
+		if strings.HasSuffix(adr.Address, "@"+d) {
+			return true, addres
+		}
+	}
+	// return false
+	return
+}
+
 func newSecretsManagerHandler() http.Handler {
 	var sesclient *sesv2.Client
+	var emDomains []string
+
 	eap := RestoreDumpFromFile()
 	if *flagEnableSES {
 		sesclient = getSesClient()
 	}
+	if *trustedDomains != "" {
+		emDomains = strings.Split(*trustedDomains, ",")
+	}
+	config := smConfig{
+		emDomains: emDomains,
+	}
+
 	log.Printf("restored from dump:\n%s\n\n", eap)
 	ticker := time.NewTicker(5 * time.Second)
 	done := make(chan bool)
 
 	sm := &secretsManager{
 		client: sesclient,
+		conf:   config,
 		eap:    eap,
 	}
 
