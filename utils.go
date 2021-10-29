@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"log"
 	"math/rand"
-	"net/mail"
 	"os"
 	"strings"
 )
@@ -34,14 +33,6 @@ func eapKey(email string) string {
 	suffix := strings.TrimRight(base64.StdEncoding.EncodeToString([]byte(email)), "=")
 	return prefix + suffix
 
-}
-func emailValidator(email string) (bool, string) {
-	adr, err := mail.ParseAddress(email)
-	if err == nil {
-		// TODO: return true only for own domains
-		return true, adr.Address
-	}
-	return false, ""
 }
 
 func SaveEAPtoFile(secretsMap EAPSecretsMap) {

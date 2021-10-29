@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	flagEnableSES = flag.Bool("enable-ses", false, "enable ses")
-	emailBcc      = flag.String("email-bcc", "", "Bcc: email address")
-	emailFrom     = flag.String("email-from", "", "From: email address")
+	flagEnableSES  = flag.Bool("enable-ses", false, "enable ses")
+	emailBcc       = flag.String("email-bcc", "", "Bcc: email address")
+	emailFrom      = flag.String("email-from", "", "From: email address")
+	trustedDomains = flag.String("trusted-domains", "", "Trusted email domains")
 )
 
 func main() {
