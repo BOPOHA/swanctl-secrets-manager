@@ -11,4 +11,4 @@ CGO_ENABLED=0  go build -ldflags="-s -w" -o ${BIN_NAME} *.go
 #upx -f --brute -o $BIN_NAME.upx $BIN_NAME
 scp ${BIN_NAME} centos@${SUB_DOMAIN}.${CORP_DOMAIN}:
 
-echo "${BIN_NAME} -enable-ses -email-bcc=support@${CORP_DOMAIN} -email-from=${SUB_DOMAIN}@${CORP_DOMAIN}"
+echo "${BIN_NAME} -enable-ses -email-bcc=anatolii@${CORP_DOMAIN} -email-from=${SUB_DOMAIN}@${CORP_DOMAIN}" -trusted-domains=${CORP_DOMAIN}
