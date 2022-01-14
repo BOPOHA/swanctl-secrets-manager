@@ -45,7 +45,8 @@ func (m *secretsManager) setEAPSecret(email, password string) {
 		Secret: password,
 		Id:     email,
 		//Expdate: time.Now().AddDate(0, 0, 7).UTC().Unix(),
-		Expdate: time.Now().Add(time.Minute * 60).UTC().Unix(),
+		//Expdate: time.Now().Add(time.Minute * 60).UTC().Unix(),
+		Expdate: time.Now().Add(time.Hour * 8).UTC().Unix(),
 	}
 	log.Println("added user " + email + "/" + password)
 	SaveEAPtoFile(m.eap)
